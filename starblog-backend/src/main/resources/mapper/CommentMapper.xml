@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.starblog.mapper.CommentMapper">
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.starblog.entity.Comment">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="article_id" property="articleId"/>
+        <result column="user_id" property="userId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用列 -->
+    <sql id="Base_Column_List">
+        id, content, article_id, user_id, parent_id, status, create_time, update_time
+    </sql>
+
+    <!-- 插入评论 -->
+    <insert id="insert" parameterType="com.starblog.entity.Comment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO comment (content, article_id, user_id, parent_id, status, create_time, update_time)
+        VALUES (#{content}, #{articleId}, #{userId}, #{parentId}, #{status}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- 根据ID删除评论 -->
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM comment WHERE id = #{id}
+    </delete>
+
+    <!-- 更新评论 -->
+    <update id="update" parameterType="com.starblog.entity.Comment">
+        UPDATE comment
+        <set>
+            <if test="content != null">content = #{content},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID查询评论 -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM comment WHERE id = #{id}
+    </select>
+
+    <!-- 根据文章ID查询评论 -->
+    <select id="selectByArticleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM comment WHERE article_id = #{articleId}
+    </select>
+
+    <!-- 根据用户ID查询评论 -->
+    <select id="selectByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM comment WHERE user_id = #{userId}
+    </select>
+
+    <!-- 根据父评论ID查询子评论 -->
+    <select id="selectByParentId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM comment WHERE parent_id = #{parentId}
+    </select>
+
+    <!-- 查询所有顶级评论 -->
+    <select id="selectRootComments" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM comment WHERE parent_id IS NULL OR parent_id = 0
+    </select>
+
+    <!-- 根据文章ID查询顶级评论 -->
+    <select id="selectRootCommentsByArticleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM comment 
+        WHERE article_id = #{articleId} AND (parent_id IS NULL OR parent_id = 0)
+    </select>
+
+    <!-- 根据状态查询评论 -->
+    <select id="selectByStatus" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM comment WHERE status = #{status}
+    </select>
+
+    <!-- 分页查询评论 -->
+    <select id="selectByPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM comment
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 统计文章评论数 -->
+    <select id="countByArticleId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM comment WHERE article_id = #{articleId}
+    </select>
+
+    <!-- 统计用户评论数 -->
+    <select id="countByUserId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM comment WHERE user_id = #{userId}
+    </select>
+
+    <!-- 统计评论总数 -->
+    <select id="countAll" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM comment
+    </select>
+</mapper>

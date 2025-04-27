@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.starblog.mapper.TagMapper">
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.starblog.entity.Tag">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用列 -->
+    <sql id="Base_Column_List">
+        id, name, create_time, update_time
+    </sql>
+
+    <!-- 插入标签 -->
+    <insert id="insert" parameterType="com.starblog.entity.Tag" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tag (name, create_time, update_time)
+        VALUES (#{name}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- 根据ID删除标签 -->
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM tag WHERE id = #{id}
+    </delete>
+
+    <!-- 更新标签 -->
+    <update id="update" parameterType="com.starblog.entity.Tag">
+        UPDATE tag
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID查询标签 -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM tag WHERE id = #{id}
+    </select>
+
+    <!-- 根据名称查询标签 -->
+    <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM tag WHERE name = #{name}
+    </select>
+
+    <!-- 查询所有标签 -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM tag
+    </select>
+
+    <!-- 根据文章ID查询标签 -->
+    <select id="selectByArticleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT t.id, t.name, t.create_time, t.update_time
+        FROM tag t
+        JOIN article_tag at ON t.id = at.tag_id
+        WHERE at.article_id = #{articleId}
+    </select>
+
+    <!-- 统计标签总数 -->
+    <select id="countAll" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM tag
+    </select>
+</mapper>

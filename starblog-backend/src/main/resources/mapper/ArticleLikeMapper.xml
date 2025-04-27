@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.starblog.mapper.ArticleLikeMapper">
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.starblog.entity.ArticleLike">
+        <id column="id" property="id"/>
+        <result column="article_id" property="articleId"/>
+        <result column="user_id" property="userId"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 通用列 -->
+    <sql id="Base_Column_List">
+        id, article_id, user_id, create_time
+    </sql>
+
+    <!-- 插入文章点赞记录 -->
+    <insert id="insert" parameterType="com.starblog.entity.ArticleLike" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO article_like (article_id, user_id, create_time)
+        VALUES (#{articleId}, #{userId}, #{createTime})
+    </insert>
+
+    <!-- 根据ID删除点赞记录 -->
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM article_like WHERE id = #{id}
+    </delete>
+
+    <!-- 根据文章ID和用户ID删除点赞记录 -->
+    <delete id="deleteByArticleIdAndUserId">
+        DELETE FROM article_like WHERE article_id = #{articleId} AND user_id = #{userId}
+    </delete>
+
+    <!-- 根据ID查询点赞记录 -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM article_like WHERE id = #{id}
+    </select>
+
+    <!-- 根据文章ID查询点赞记录 -->
+    <select id="selectByArticleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM article_like WHERE article_id = #{articleId}
+    </select>
+
+    <!-- 根据用户ID查询点赞记录 -->
+    <select id="selectByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM article_like WHERE user_id = #{userId}
+    </select>
+
+    <!-- 根据文章ID和用户ID查询点赞记录 -->
+    <select id="selectByArticleIdAndUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM article_like 
+        WHERE article_id = #{articleId} AND user_id = #{userId}
+    </select>
+
+    <!-- 统计文章点赞数 -->
+    <select id="countByArticleId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM article_like WHERE article_id = #{articleId}
+    </select>
+
+    <!-- 统计用户点赞数 -->
+    <select id="countByUserId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM article_like WHERE user_id = #{userId}
+    </select>
+</mapper>
